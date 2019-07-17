@@ -1,0 +1,17 @@
+------------------
+Order Details
+-----------------
+Order ID: 2019242
+Date: 20190716
+
+
+
+
+----------------------
+Feature Types
+-----------------------
+ - Hydrometric Stations - Active and Discontinued in subdirectory ENVCAN_HYDROMETRIC_STN_SP
+
+----------------------------
+Packaged Products
+----------------------------
