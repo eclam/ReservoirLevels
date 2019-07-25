@@ -57,6 +57,8 @@ for input_dir in station_data['WEATHER_DIR']:
     if os.path.isdir("{}/daily".format(input_dir)):
         weather = spark.read.csv("{}/daily".format(input_dir), weather_schema)
         filtered_weather = weather.filter(weather['Date/Time'].like("%-%-%")).select('Date/Time', "Total Rain (mm)", "Total Snow (cm)", "Total Precip (mm)")
+        
+        # toPandas should be fine, we have at most one entry per day and at most 70 years of weather data
         filtered_weather.toPandas().set_index('Date/Time').to_csv('{}/weather_data_test/{}.csv'.format(dir_name, station_id))
     else:
         print('not present')
