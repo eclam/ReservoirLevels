@@ -44,6 +44,25 @@ except ImportError:
     from urlparse import urlparse
     from urllib2 import urlopen, Request, HTTPError, URLError, build_opener, HTTPCookieProcessor
 
+import subprocess
+import pandas as pd
+import os
+
+dir_name = os.path.dirname(os.path.abspath(__file__))
+os.chdir(dir_name)
+
+
+def get_input_directory(station_id):
+    get_input_dir_cmd = "find -type d -name '{}'".format(station_id)
+    return subprocess.getoutput(get_input_dir_cmd).split('\n')[0]
+
+
+station_data = pd.read_csv('reservoir_weather_data.csv')
+station_data['WEATHER_DIR'] = station_data['Station ID'].apply(
+    get_input_directory)
+cpy_cmd = ""
+subprocess.run(cpy_cmd, shell=True, check=True)
+
 short_name = 'SPL2SMP'
 version = '005'
 time_start = '2015-03-31T00:00:00Z'
