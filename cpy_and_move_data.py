@@ -6,6 +6,7 @@ import re
 
 dir_name = os.path.dirname(os.path.abspath(__file__))
 os.chdir(dir_name)
+# /ReservoirLevels/data/bathymetric_archive/bathymetric_maps/BATH_SURVEY_MAP_SHEETS_SVW/BS_MS_SVW.csv
 
 
 def clean_name(inventory_list):
