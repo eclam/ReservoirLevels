@@ -100,8 +100,7 @@ daily_data = pd.read_sql_query(daily_levels_query,conn)
 # In[20]:
 
 
-#station_data.apply(get_station_data, axis=1)
-get_station_data(station_data.iloc[0])
+station_data.apply(get_station_data, axis=1)
 
 
 # In[ ]:
