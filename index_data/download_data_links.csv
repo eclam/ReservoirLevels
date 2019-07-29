@@ -3,7 +3,5 @@
 "https://catalogue.data.gov.bc.ca/dataset/hydrometric_data","BC hydrometric data","MANUAL","DL'ed"
 "http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/","Canadian Govt's HYDAT hydrometric data","MANUAL","DL'ed but need to make sqlite3 query script"
 "https://drive.google.com/drive/folders/1WJCDEU34c60IfOnG4rv5EPZ4IhhW9vZH","Canadian Govt's weather station data","AUTOMATED","Need to do: FTP this & automate it w/ python or bash. Credit: Matthew Fung (Atmospherics Major)"
-"https://catalogue.data.gov.bc.ca/dataset/bathymetric-maps-of-surveyed-lakes","BC bathymetric contour map of surveyed lakes","MANUAL","idk if i could get my hands on this info..."
 "https://catalogue.data.gov.bc.ca/dataset/lake-inventory-surveys", "Lake Inventory Survey: info on the lakes", "MANUAL", "downloaded"
-"https://catalogue.data.gov.bc.ca/dataset/bathymetric-maps-of-surveyed-lakes", "Bathymetric maps of surveyed lakes", "MANUAL", "downloaded. it's crappier"
-"https://catalogue.data.gov.bc.ca/dataset/bathymetric-maps#edc-pow", "Bathymetric maps", "MANUAL", "downloaded"
+
