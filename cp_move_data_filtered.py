@@ -49,8 +49,10 @@ def dl_monthly_data(inventory_list):
                 "&Year={}".format(inventory_list["MLY First Year"]) + \
                 "&Month={}".format("1") + \
                 "&timeframe={}&submit=Download+Data\";)".format("3")
-    
-    subprocess.run(curl_cmd , shell=True, check=True)    
+    try:
+        subprocess.run(curl_cmd , shell=True, check=True)    
+    except:
+        pass
     
 def dl_daily_data(inventory_list):
     if inventory_list["DLY First Year"] == 0 or inventory_list["DLY Last Year"] == 0:
@@ -70,7 +72,10 @@ def dl_daily_data(inventory_list):
                 "&Month={}".format("1") + \
                 "&timeframe={}&submit=Download+Data\"; done)".format("2")
     
-    subprocess.run(curl_cmd , shell=True, check=True) 
+    try:
+        subprocess.run(curl_cmd , shell=True, check=True)    
+    except:
+        pass
 
 def dl_hourly_data(inventory_list):
     if inventory_list["HLY First Year"] == 0 or inventory_list["HLY Last Year"] == 0:
@@ -97,7 +102,10 @@ def dl_hourly_data(inventory_list):
                 "&Month=${" +"month}" + \
                 "&timeframe={}&submit=Download+Data\" ; done ; done)".format("1")
     
-    subprocess.run(curl_cmd , shell=True, check=True)
+    try:
+        subprocess.run(curl_cmd , shell=True, check=True)    
+    except:
+        return -1
     return 1
 
 def rm_hourly_data(inventory_list):
@@ -113,7 +121,11 @@ def rm_hourly_data(inventory_list):
                       "{}/{}/hourly/".format(inventory_list["Name"],inventory_list["Station ID"])
 
         curl_cmd = "rm -rf {}".format(dir_path)
-        subprocess.run(curl_cmd , shell=True, check=True)
+        try:
+            subprocess.run(curl_cmd , shell=True, check=True)    
+        except:
+            pass
+        
 
 def mv_filtered_data(inventory_list):
     dir_path = dir_name + "/data/weather_data/{}/".format(inventory_list["Name"])
