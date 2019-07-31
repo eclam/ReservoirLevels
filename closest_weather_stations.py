@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 
 
-def distance(entity, stations):
+def distance(hydro_data, weather_stations):
     """
-    Given a entity with 'latitude'/'longitude' (degrees)
+    Given a hydro_data with 'latitude'/'longitude' (degrees)
     calculate its distance from each station 'lat'/'lon' (radians)
     """
     def hav(theta):
@@ -18,59 +18,61 @@ def distance(entity, stations):
         """
         return 0.5 * (1 - np.cos(theta))
 
-    entity_lat = np.radians(entity['LATITUDE'])
-    entity_lon = np.radians(entity['LONGITUDE'])
+    hydro_data_lat = np.radians(hydro_data['LATITUDE'])
+    hydro_data_lon = np.radians(hydro_data['LONGITUDE'])
 
     r = 6371  # in km
-    h1 = hav(stations['LAT_RAD'] - entity_lat)
-    h2 = np.cos(entity_lat) * \
-        np.cos(stations['LAT_RAD'])*hav(stations['LON_RAD']-entity_lon)
+    h1 = hav(weather_stations['LAT_RAD'] - hydro_data_lat)
+    h2 = np.cos(hydro_data_lat) * \
+        np.cos(weather_stations['LAT_RAD'])*hav(weather_stations['LON_RAD']-hydro_data_lon)
 
     return 2 * r * np.arcsin(np.sqrt(h1 + h2))
 
 
-def closest_station(entity, stations):
+def closest_station(hydro_data, weather_stations):
     """
-        Returns the tmax of the station closest to the entity
+        Returns the tmax of the station closest to the hydro_data
     """
     # get a single station for consistency
-    first_year = entity['D.YEAR_FROM']
-    last_year = entity['D.YEAR_TO']
-    stations = stations[(stations['First Year'] <= first_year)
-                        & (stations['Last Year'] >= last_year)]
-    if len(stations) <= 0:
+    first_year = hydro_data['YEAR_FROM']
+    last_year = hydro_data['YEAR_TO']
+    weather_stations = weather_stations[(weather_stations['First Year'] <= first_year)
+                        & (weather_stations['Last Year'] >= last_year)]
+    if len(weather_stations) <= 0:
         # no suitable stations found
         return None
-    distances = distance(entity, stations)
+    distances = distance(hydro_data, weather_stations)
 
-    return_row = stations.loc[distances.idxmin()][:]
+    return_row = weather_stations.loc[distances.idxmin()][:]
     return_row['DISTANCE'] = distances.min()
-    return_row['HYDRO_ID'] = entity['STATION_NUMBER']
+    return_row['HYDRO_ID'] = hydro_data['STATION_NUMBER']
     return return_row
 
 
 # see http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/HYDAT_Definition_EN.pdf for HYDAT schema
+hydro_data = pd.read_csv('./index_data/filtered_station_inventory.csv')
+hydro_data['LAT_RAD'] = np.radians(hydro_data['LATITUDE'])
+hydro_data['LON_RAD'] = np.radians(hydro_data['LONGITUDE'])
 
-# grab hydro station data 
+weather_data = pd.read_csv("./index_data/filtered_weather_inventory.csv", sep=',')
+weather_data['LAT_RAD'] = np.radians(weather_data['Latitude (Decimal Degrees)'])
+weather_data['LON_RAD'] = np.radians(weather_data['Longitude (Decimal Degrees)'])
 
-station_data = pd.read_csv("./index_data/filtered_station_inventory.csv",sep=',')
-
-# get the hydro station data we care about
-# table issmall enough that we don't need to build into the sql query
-lakes = pd.read_csv('./index_data/filter_station_inventory.csv')
-lakes_with_latlon = station_data[station_data['STATION_NUMBER'].isin(lakes['STATION_ID'])]
-
-# get weather station data
-stations = pd.read_csv('weather_station_inventory_bc.csv')
-stations['LAT_RAD'] = np.radians(stations['Latitude (Decimal Degrees)'])
-stations['LON_RAD'] = np.radians(stations['Longitude (Decimal Degrees)'])
-stations = stations[['Latitude (Decimal Degrees)', 'Longitude (Decimal Degrees)', 'LAT_RAD',
-                     'LON_RAD', 'Name', 'Climate ID', 'Station ID', 'First Year', 'Last Year', 'Elevation (m)']]
+weather_data = weather_data[['Latitude (Decimal Degrees)', 'Longitude (Decimal Degrees)', 'LAT_RAD',
+                                                    'LON_RAD', 'Name', 'Station ID', 'First Year', 'Last Year']]
 
 # link up the best (closest station w/data) weather to hydro station
-best_weather_stations = lakes_with_latlon.apply(
-    closest_station, axis=1, stations=stations).set_index('HYDRO_ID')
-weather_data = pd.merge(best_weather_stations, lakes_with_latlon.set_index(
-    'STATION_NUMBER'), left_index=True, right_index=True)
+best_weather_stations = hydro_data.apply(closest_station, 
+                                                                    axis=1, weather_stations=weather_data)\
+                                                                        .set_index('HYDRO_ID')
 
-weather_data.to_csv('reservoir_weather_data.csv')
+hydro_data = hydro_data.drop(['LAT_RAD','LON_RAD'],axis=1)
+weather_data = weather_data.drop(['LAT_RAD','LON_RAD'],axis=1)
+best_weather_stations = best_weather_stations.drop(['LAT_RAD','LON_RAD'],axis=1)
+
+weather_data = pd.merge(best_weather_stations, 
+                                          hydro_data.set_index('STATION_NUMBER'),
+                                                                              left_index=True, right_index=True)
+
+
+weather_data.to_csv('./index_data/closest_weather_to_hydro_stations.csv')
