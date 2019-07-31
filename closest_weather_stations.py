@@ -50,7 +50,7 @@ def closest_station(entity, stations):
 
 
 # see http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/HYDAT_Definition_EN.pdf for HYDAT schema
-db_filename = 'Hydat.sqlite3'
+db_filename = './data/Hydat.sqlite3'
 conn = sqlite3.connect(db_filename)
 
 # grab hydro station data from hydat
