@@ -54,12 +54,15 @@ hydro_data = pd.read_csv('./index_data/filtered_station_inventory.csv')
 hydro_data['LAT_RAD'] = np.radians(hydro_data['LATITUDE'])
 hydro_data['LON_RAD'] = np.radians(hydro_data['LONGITUDE'])
 
-weather_data = pd.read_csv("./index_data/filtered_weather_inventory.csv", sep=',')
+weather_data = pd.read_csv("./index_data/filteredNULL_weather_inventory.csv", sep=',')
 weather_data['LAT_RAD'] = np.radians(weather_data['Latitude (Decimal Degrees)'])
 weather_data['LON_RAD'] = np.radians(weather_data['Longitude (Decimal Degrees)'])
 
 weather_data = weather_data[['Latitude (Decimal Degrees)', 'Longitude (Decimal Degrees)', 'LAT_RAD',
-                                                    'LON_RAD', 'Name', 'Station ID', 'First Year', 'Last Year']]
+                                                    'LON_RAD', 'Name', 'Station ID', 'First Year', 'Last Year',
+                                                    "daily_temp_nullcount", "monthly_temp_nullcount",
+                                                    "daily_precipiation_nullcount","monthly_precipiation_nullcount",
+                                                    "daily_snow_nullcount","monthly_snow_nullcount"]]
 
 # link up the best (closest station w/data) weather to hydro station
 best_weather_stations = hydro_data.apply(closest_station, 
@@ -73,6 +76,5 @@ best_weather_stations = best_weather_stations.drop(['LAT_RAD','LON_RAD'],axis=1)
 weather_data = pd.merge(best_weather_stations, 
                                           hydro_data.set_index('STATION_NUMBER'),
                                                                               left_index=True, right_index=True)
-
 
 weather_data.to_csv('./index_data/closest_weather_to_hydro_stations.csv')

@@ -37,3 +37,8 @@ steps to run:
 - run `spark-submit --master=local[2] weather_csv_consolidate.py` 
     - parse all the files together properly (needs to be edited and adjust properly)
 - run `combine_data.py` into workable file format for our models (need to be eventually done)
+
+
+NOTE: 
+- Some stations specialize in certain metric recording. 
+    -I.E. Kelp Reefs is a wind station and is terrible for our purposes

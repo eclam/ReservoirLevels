@@ -80,7 +80,7 @@ def clean_name(archive_list):
 
 
 def get_dir(inventory_list):
-    return "{}{}/{}".format(dl_path, inventory_list["Name"], inventory_list["Station ID"])
+    return "{}{}/{}".format(dl_path, inventory_list["temp_name"], inventory_list["Station ID"])
 
 def filter_temp_daily(weather_list):
     if os.path.isdir("{}/daily".format(weather_list["weather_dir"])):
@@ -266,8 +266,7 @@ def filter_snow_monthly(weather_list):
 weather_fpath = "./index_data/filtered_weather_inventory.csv"
 weather_inventory = pd.read_csv(weather_fpath, sep=",")
 
-name = weather_inventory["Name"]
-weather_inventory["Name"] = weather_inventory.apply(clean_name, axis=1)
+weather_inventory["temp_name"] = weather_inventory.apply(clean_name, axis=1)
 
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
 
@@ -280,8 +279,16 @@ weather_inventory["monthly_precipiation_nullcount"] = weather_inventory.apply(fi
 weather_inventory["daily_snow_nullcount"] = weather_inventory.apply(filter_snow_daily,axis=1)
 weather_inventory["monthly_snow_nullcount"] = weather_inventory.apply(filter_snow_monthly,axis=1)
 
-weather_inventory["Name"] = name
-weather_inventory = weather_inventory.drop(["weather_dir"],axis=1)
+weather_inventory = weather_inventory[
+        (weather_inventory["daily_temp_nullcount"] != 1) |
+        (weather_inventory["monthly_temp_nullcount"] != 1) |
+        (weather_inventory["daily_precipiation_nullcount" ] != 1) |
+        (weather_inventory["monthly_precipiation_nullcount"] != 1) |
+        (weather_inventory["daily_snow_nullcount"] != 1) |
+        (weather_inventory["monthly_snow_nullcount"] != 1)
+    ]
+
+weather_inventory = weather_inventory.drop(["weather_dir","temp_name"],axis=1)
 
 df = pd.DataFrame()
 df['counts'] = ["\tfor daily temp: {}".format(weather_inventory['daily_temp_nullcount'].sum()), 

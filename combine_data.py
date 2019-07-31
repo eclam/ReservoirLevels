@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import pandas as pd
 import sqlite3
 
@@ -12,9 +6,6 @@ import matplotlib.pyplot as plt
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from pykalman import KalmanFilter
 import numpy as np
-
-
-# In[2]:
 
 
 def get_weather_data(weather_station_id):
@@ -35,7 +26,6 @@ def get_weather_data(weather_station_id):
     return weather_data#.dropna(subset=['precip'])
 
 
-# In[15]:
 
 
 def get_combined_data(daily_data, hydro_station_id, weather_station_id):
@@ -81,15 +71,11 @@ station_data.rename(columns=rename_map, inplace=True)
 #station_data
 
 
-# In[18]:
-
 
 # see http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/HYDAT_Definition_EN.pdf for HYDAT schema
 db_filename = 'Hydat.sqlite3'
 conn = sqlite3.connect(db_filename)
 
-
-# In[19]:
 
 
 station_filter_str = str(list(station_data['hydro_id']))[1:-1]
@@ -97,20 +83,6 @@ daily_levels_query = "SELECT * FROM DLY_LEVELS WHERE STATION_NUMBER IN ({station
 daily_data = pd.read_sql_query(daily_levels_query,conn)
 
 
-# In[20]:
-
 
 station_data.apply(get_station_data, axis=1)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
