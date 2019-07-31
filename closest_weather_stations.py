@@ -51,7 +51,7 @@ def closest_station(entity, stations):
 
 # see http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/HYDAT_Definition_EN.pdf for HYDAT schema
 
-# grab hydro station data from hydat
+# grab hydro station data 
 
 station_data = pd.read_csv("./index_data/filtered_station_inventory.csv",sep=',')
 
