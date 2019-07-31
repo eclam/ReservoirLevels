@@ -16,13 +16,24 @@ steps to run:
 - run `combine_data.py` to consolidate the level and weather data (TODO: better name)
 
 
-(eric) steps to run to filter data: 
-- run `hydro_and_weather_stn_filter.py` to filter out weather_station and hydro_station data 
-    - hydro_station data is broken up to River, Creek, Lake 
-        - there is a csv that is combination of all of these files 
-- run `cp_move_data_filtered` to move the data to a filtered folder (NOT MANDATORY)
-- run `filter_bad_weather_data.py` to filter out bad weather stations 
+
+
+(eric) steps to run IN FOLLOWING ORDER to filter and combine data: 
+- run `python3 hydro_and_weather_stn_filter.py` to filter out weather_station and hydro_station data 
+    - hydro_station data is broken up to River, Creek, Lake -> produces these files: 
+        - `filtered_creek_inventory.csv`    
+        - `filtered_lake_inventory.csv`
+        - `filtered_river_inventory.csv`
+        - `filtered_station_inventory.csv` (combination of all of these files)
+
+- run `python3 cpy_move_data.py` (NOT MANDATORY -> for Eric's use)
+- run `python3 dl_filtered_weather_data.py` to move the data to a filtered folder (NOT MANDATORY -> Eric's use)
+- run `spark-submit --master=local[2] filter_bad_weather_data.py` to filter out bad weather stations 
     - gives you a number of bad weather stations based on the data column bundle 
         - i.e. Rain, Snow, Temperature
-- run `weather_csv_consolidate.py` to parse all the files together properly (needs to be edited and adjust properly)
+    - produces this file:  `filteredNULL_weather_inventory.csv`
+- run `python3 closest_weather_stations.py` 
+    - 
+- run `spark-submit --master=local[2] weather_csv_consolidate.py` 
+    - parse all the files together properly (needs to be edited and adjust properly)
 - run `combine_data.py` into workable file format for our models (need to be eventually done)

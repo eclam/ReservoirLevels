@@ -85,7 +85,7 @@ def dl_hourly_data(inventory_list):
             (inventory_list["DLY First Year"] > 0 or inventory_list["DLY Last Year"] > 0):
         return 0
 
-    mk_dir_path = dl_path + "{}/{}/daily".format(inventory_list["Name"],inventory_list["Station ID"])
+    mk_dir_path = dl_path + "{}/{}/hourly".format(inventory_list["Name"],inventory_list["Station ID"])
     try:
         os.makedirs(mk_dir_path) #folder for station ID -> if names are not unique
     except OSError as e:
@@ -93,14 +93,14 @@ def dl_hourly_data(inventory_list):
         pass
 
     curl_cmd = "(cd {}; ".format(mk_dir_path) + \
-                "for year in `seq {} {}`;do ".format(inventory_list["DLY First Year"], inventory_list["DLY Last Year"]) + \
+                "for year in `seq {} {}`;do ".format(inventory_list["HLY First Year"], inventory_list["HLY Last Year"]) + \
                 "for month in `seq 1 12`;do " + \
                 "curl -sJLO " + \
                 "\"http://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv" + \
                 "&stationID={}".format(inventory_list["Station ID"]) + \
                 "&Year=${" + "year}" + \
                 "&Month=${" +"month}" + \
-                "&timeframe={}&submit=Download+Data\" ; done ; done)".format("1")
+                "&timeframe={}&submit=Download+Data\";done ; done)".format("1")
     
     try:
         subprocess.run(curl_cmd , shell=True, check=True)    
@@ -138,6 +138,7 @@ def mv_filtered_data(inventory_list):
 
 weather_fpath = "./index_data/filtered_weather_inventory.csv"
 weather_inventory = pd.read_csv(weather_fpath, sep=",")
+weather_inventory = weather_inventory.fillna(0)
 name = weather_inventory["Name"]
 weather_inventory["Name"] = weather_inventory.apply(clean_name, axis=1)
 
@@ -150,10 +151,10 @@ weather_inventory["Name"] = weather_inventory.apply(clean_name, axis=1)
 # weather_inventory.apply(mv_filtered_data,axis=1)
 # weather_inventory.apply(make_station_folders, axis=1)
 
-weather_inventory.apply(dl_daily_data, axis=1) #i fucked up something. gotta re-dl it 
-weather_inventory.apply(dl_monthly_data, axis=1)
+# weather_inventory.apply(dl_daily_data, axis=1) #i fucked up something. gotta re-dl it 
+# weather_inventory.apply(dl_monthly_data, axis=1)
 
 weather_inventory["hourly_only_flag"] = weather_inventory.apply(dl_hourly_data, axis=1)
 
-weather_inventory["Name"] = name
+# weather_inventory["Name"] = name
 weather_inventory.to_csv(dir_name+"/index_data/filtered_station_inventory.csv")

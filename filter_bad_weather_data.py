@@ -265,9 +265,12 @@ def filter_snow_monthly(weather_list):
 
 weather_fpath = "./index_data/filtered_weather_inventory.csv"
 weather_inventory = pd.read_csv(weather_fpath, sep=",")
+
 name = weather_inventory["Name"]
 weather_inventory["Name"] = weather_inventory.apply(clean_name, axis=1)
+
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
+
 weather_inventory["daily_temp_nullcount"] = weather_inventory.apply(filter_temp_daily,axis=1)
 weather_inventory["monthly_temp_nullcount"] = weather_inventory.apply(filter_temp_monthly,axis=1)
 
@@ -289,6 +292,6 @@ df['counts'] = ["\tfor daily temp: {}".format(weather_inventory['daily_temp_null
                 "\tmonthly snow: {}".format(weather_inventory['monthly_snow_nullcount'].sum()) 
                 ]
 
-df.to_csv("./weather_data_test/nullcounts.txt",index=None, sep='\n',mode='a')
+df.to_csv("./index_data/nullcounts.txt",index=None, sep='\n',mode='a')
 
 weather_inventory.to_csv("./index_data/filteredNULL_weather_inventory.csv")

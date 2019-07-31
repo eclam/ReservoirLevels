@@ -1,0 +1,7 @@
+counts
+	for daily temp: 39
+	for daily precipitation: 38
+	for daily snow: 105
+	monthly temp: 26
+	monthly precipiation: 26
+	monthly snow: 26

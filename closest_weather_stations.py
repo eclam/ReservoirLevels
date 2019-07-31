@@ -50,22 +50,15 @@ def closest_station(entity, stations):
 
 
 # see http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/HYDAT_Definition_EN.pdf for HYDAT schema
-db_filename = './data/Hydat.sqlite3'
-conn = sqlite3.connect(db_filename)
 
 # grab hydro station data from hydat
-station_data_query = """SELECT S.*, D.YEAR_FROM, D.YEAR_TO, D.RECORD_LENGTH FROM
-(SELECT STATION_NUMBER, STATION_NAME, LATITUDE, LONGITUDE, DRAINAGE_AREA_GROSS FROM STATIONS WHERE STATIONS.PROV_TERR_STATE_LOC='BC') S
-INNER JOIN
-(SELECT STATION_NUMBER, YEAR_FROM, YEAR_TO, RECORD_LENGTH FROM STN_DATA_RANGE WHERE DATA_TYPE = 'H') D
-ON S.STATION_NUMBER = D.STATION_NUMBER;"""
-station_data = pd.read_sql_query(station_data_query, conn)
+
+station_data = pd.read_csv("./index_data/filtered_station_inventory.csv",sep=',')
 
 # get the hydro station data we care about
 # table issmall enough that we don't need to build into the sql query
-lakes = pd.read_csv('reservoir_list.csv')
-lakes_with_latlon = station_data[station_data['STATION_NUMBER'].isin(
-    lakes['STATION_ID'])]
+lakes = pd.read_csv('./index_data/filter_station_inventory.csv')
+lakes_with_latlon = station_data[station_data['STATION_NUMBER'].isin(lakes['STATION_ID'])]
 
 # get weather station data
 stations = pd.read_csv('weather_station_inventory_bc.csv')
