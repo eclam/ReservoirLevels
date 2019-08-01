@@ -18,16 +18,12 @@ x_train = weather data
 
 
 Things to do : 
-- Need to have data merged 
-- If NULL, look at pervious years if it exists and fill it in to current data set -> or if GHCN has something then use that 
-- Figure out whether if we want to use daily or monthly in training 
-
-
-our data is so bad we went from 266 filtered weather stations to finding 199 weather stations that have complete weather data
-
-AMT of BAD daily temp data:  67
-AMT of BAD daily precipitation data:  65
-AMT of BAD daily snow data:  109
-AMT of BAD temp monthly data:  36
-AMT of BAD precipiation monthly data:  36
-AMT of BAD snow monthly data:  36
+1. finished consolidate data & combine data to get the hdf file 
+2. Cluster data 
+    - group data by months  
+    - 3 cluster your data center -> return the values of the centers 
+        - cluster rain, temperature 
+        clusters of years of those months 
+    - stdev 
+    (looking for a base where we can build data off of -> get stdev )
+(look into other forms of clustering)
