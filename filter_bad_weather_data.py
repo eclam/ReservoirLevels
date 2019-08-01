@@ -11,6 +11,32 @@ spark.sparkContext.setLogLevel('WARN')
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
 assert spark.version >= '2.3'  # make sure we have Spark 2.3+
 
+hourly_weather_schema = types.StructType([
+    types.StructField("Date/Time", types.StringType()),
+    types.StructField("Year", types.IntegerType()),
+    types.StructField("Month", types.IntegerType()),
+    types.StructField("Day", types.IntegerType()),
+    types.StructField("Time", types.StringType()),
+    types.StructField("Temp (°C)", types.StringType()),
+    types.StructField("Temp Flag", types.StringType()),
+    types.StructField("Dew Point Temp (°C)", types.StringType()),
+    types.StructField("Dew Point Temp Flag", types.StringType()),
+    types.StructField("Rel Hum (%)", types.StringType()),
+    types.StructField("Rel Hum Flag", types.StringType()),
+    types.StructField("Wind Dir (10s deg)", types.StringType()),
+    types.StructField("Wind Dir Flag", types.StringType()),
+    types.StructField("Wind Spd (km/h)", types.StringType()),
+    types.StructField("Wind Spd Flag", types.StringType()),
+    types.StructField("Visibility (km)", types.StringType()),
+    types.StructField("Visibility Flag", types.StringType()),
+    types.StructField("Stn Press (kPa)", types.StringType()),
+    types.StructField("Stn Press Flag", types.StringType()),
+    types.StructField("Hmdx", types.StringType()),
+    types.StructField("Hmdx Flag", types.StringType()),
+    types.StructField("Wind Chill", types.StringType()),
+    types.StructField("Wind Chill Flag", types.StringType()),
+    types.StructField("Weather", types.StringType())
+])
 
 daily_weather_schema = types.StructType([
     types.StructField('Date/Time', types.StringType()),
@@ -301,4 +327,6 @@ df['counts'] = ["\tfor daily temp: {}".format(weather_inventory['daily_temp_null
 
 df.to_csv("./index_data/nullcounts.txt",index=None, sep='\n',mode='a')
 
-weather_inventory.to_csv("./index_data/filteredNULL_weather_inventory.csv")
+weather_inventory.sort_values(['Name'],ascending=[True])\
+                .drop(['Unnamed: 0'],axis=1)\
+                .to_csv("./index_data/filteredNULL_weather_inventory.csv")

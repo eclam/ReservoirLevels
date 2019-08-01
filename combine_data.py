@@ -25,9 +25,6 @@ def get_weather_data(weather_station_id):
     # get rid of weather data values w/o precip data?
     return weather_data#.dropna(subset=['precip'])
 
-
-
-
 def get_combined_data(daily_data, hydro_station_id, weather_station_id):
     LEVELS = ['LEVEL{}'.format(dayno) for dayno in range(1,32)]
     station_day_data = daily_data[daily_data['STATION_NUMBER'] == hydro_station_id]
