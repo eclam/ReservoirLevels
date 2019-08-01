@@ -65,7 +65,7 @@ def dl_daily_data(inventory_list):
         pass
         
     curl_cmd = "(cd {}; ".format(mk_dir_path) + \
-                "for year in `seq {} {}`;do curl -sJLO ".format(inventory_list["DLY First Year"], inventory_list["DLY Last Year"]) + \
+                "for year in `seq {} {}`;do curl -JLO ".format(inventory_list["DLY First Year"], inventory_list["DLY Last Year"]) + \
                 "\"http://climate.weather.gc.ca/climate_data/bulk_data_e.html?format=csv" + \
                 "&stationID={}".format(inventory_list["Station ID"]) + \
                 "&Year=${" + "year}" + \
@@ -151,10 +151,12 @@ weather_inventory["Name"] = weather_inventory.apply(clean_name, axis=1)
 # weather_inventory.apply(mv_filtered_data,axis=1)
 # weather_inventory.apply(make_station_folders, axis=1)
 
-# weather_inventory.apply(dl_daily_data, axis=1) #i fucked up something. gotta re-dl it 
+
+
+weather_inventory.apply(dl_daily_data, axis=1) #i fucked up something. gotta re-dl it 
 # weather_inventory.apply(dl_monthly_data, axis=1)
 
-weather_inventory["hourly_only_flag"] = weather_inventory.apply(dl_hourly_data, axis=1)
+# weather_inventory["hourly_only_flag"] = weather_inventory.apply(dl_hourly_data, axis=1)
 
 # weather_inventory["Name"] = name
-weather_inventory.to_csv(dir_name+"/index_data/filtered_station_inventory.csv")
+# weather_inventory.to_csv(dir_name+"/index_data/filtered_weather_inventory.csv")

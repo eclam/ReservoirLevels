@@ -33,7 +33,7 @@ steps to run:
         - i.e. Rain, Snow, Temperature
     - produces this file:  `filteredNULL_weather_inventory.csv`
 - run `python3 closest_weather_stations.py` 
-    - 
+    - <IMPORTANT NOTE>: this COULD does filter whether distances <50 km 
 - run `spark-submit --master=local[2] weather_csv_consolidate.py` 
     - parse all the files together properly (needs to be edited and adjust properly)
 - run `combine_data.py` into workable file format for our models (need to be eventually done)

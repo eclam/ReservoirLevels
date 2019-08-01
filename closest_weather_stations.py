@@ -59,22 +59,25 @@ weather_data['LAT_RAD'] = np.radians(weather_data['Latitude (Decimal Degrees)'])
 weather_data['LON_RAD'] = np.radians(weather_data['Longitude (Decimal Degrees)'])
 
 weather_data = weather_data[['Latitude (Decimal Degrees)', 'Longitude (Decimal Degrees)', 'LAT_RAD',
-                                                    'LON_RAD', 'Name', 'Station ID', 'First Year', 'Last Year',
-                                                    "daily_temp_nullcount", "monthly_temp_nullcount",
-                                                    "daily_precipiation_nullcount","monthly_precipiation_nullcount",
-                                                    "daily_snow_nullcount","monthly_snow_nullcount"]]
+                             'LON_RAD', 'Name', 'Station ID', 'First Year', 'Last Year',
+                             "daily_temp_nullcount", "monthly_temp_nullcount",
+                             "daily_precipiation_nullcount","monthly_precipiation_nullcount",
+                             "daily_snow_nullcount","monthly_snow_nullcount"]]
 
 # link up the best (closest station w/data) weather to hydro station
-best_weather_stations = hydro_data.apply(closest_station, 
-                                                                    axis=1, weather_stations=weather_data)\
-                                                                        .set_index('HYDRO_ID')
+best_weather_stations = hydro_data.apply(closest_station, axis=1, weather_stations=weather_data)\
+                                            .set_index('HYDRO_ID')
 
 hydro_data = hydro_data.drop(['LAT_RAD','LON_RAD'],axis=1)
 weather_data = weather_data.drop(['LAT_RAD','LON_RAD'],axis=1)
 best_weather_stations = best_weather_stations.drop(['LAT_RAD','LON_RAD'],axis=1)
 
-weather_data = pd.merge(best_weather_stations, 
-                                          hydro_data.set_index('STATION_NUMBER'),
-                                                                              left_index=True, right_index=True)
+weather_data = pd.merge(best_weather_stations, hydro_data.set_index('STATION_NUMBER')
+                        ,left_index=True, right_index=True)
+
+weather_data = weather_data.drop_duplicates().drop(['Unnamed: 0'],axis=1)
+
+# Dropping stations that are WAY too far away to even have an accurate reading 
+# weather_data = weather_data[weather_data['DISTANCE']<50]
 
 weather_data.to_csv('./index_data/closest_weather_to_hydro_stations.csv')

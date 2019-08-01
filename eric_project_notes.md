@@ -19,6 +19,11 @@ x_train = weather data
 
 Things to do : 
 1. finished consolidate data & combine data to get the hdf file 
+    - consolidate data
+        - transform  monthly  -> daily
+    - combine data 
+        - grab data from hydat.sqlite3 
+
 2. Cluster data 
     - group data by months  
     - 3 cluster your data center -> return the values of the centers 

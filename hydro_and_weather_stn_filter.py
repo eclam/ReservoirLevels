@@ -41,6 +41,11 @@ weather_inventory[["First Year", "Last Year", "HLY First Year", "HLY Last Year",
                                                                             "HLY Last Year", "DLY First Year", "DLY Last Year",
                                                                             "MLY First Year", "MLY Last Year"]].apply(pd.to_numeric, downcast='integer')
 
+weather_inventory = weather_inventory[(weather_inventory["DLY First Year"] != 0) |
+                                      (weather_inventory["MLY First Year"] != 0) | 
+                                      (weather_inventory["DLY Last Year"] != 0) |
+                                      (weather_inventory["MLY Last Year"] != 0) ]
+
 weather_inventory = weather_inventory[(weather_inventory['Last Year'] >= 2015) &
                                       (weather_inventory['First Year'] <= 2010)].reset_index(drop=True)
 
@@ -68,17 +73,44 @@ good_stations_query = """SELECT F.*
                         ORDER BY F.STATION_NAME ASC;"""
 
 station_inventory = pd.read_sql_query(good_stations_query, db_conn)
-station_inventory['temp_name'] = station_inventory.apply(
-    river_vs_lake_cleaner, axis=1)
 
-river_inventory = station_inventory[station_inventory['temp_name'].str.contains(
-    "RIVER")]
-creek_inventory = station_inventory[(
-    station_inventory['temp_name'].str.contains("CREEK"))]
-lake_inventory = station_inventory[station_inventory['temp_name'].str.contains(
-    "LAKE")]
+# Custom parsing selected hydro stations: 
+custom_list = pd.read_csv('reservoir_list.csv', sep=",")
 
-station_inventory = station_inventory.drop(['temp_name'], axis=1)
+list_cust_station_id = ''
+for i in custom_list['Station ID']:
+    list_cust_station_id = list_cust_station_id + "\"" + i + "\""
+    list_cust_station_id = list_cust_station_id + ", "
+
+selected_stations_query = """SELECT F.*
+                            FROM (SELECT S.*, D.YEAR_FROM, D.YEAR_TO, D.RECORD_LENGTH 
+                                FROM (SELECT STATION_NUMBER, STATION_NAME, LATITUDE, LONGITUDE
+                                        FROM STATIONS WHERE STATION_NUMBER in ({})
+                                        ) S
+                                        INNER JOIN
+                                        (SELECT STATION_NUMBER, YEAR_FROM, YEAR_TO, RECORD_LENGTH 
+                                        FROM STN_DATA_RANGE 
+                                        ) D
+                                        ON S.STATION_NUMBER = D.STATION_NUMBER) F
+                            ORDER BY F.STATION_NAME ASC;"""\
+                            .format(list_cust_station_id[:-2])
+
+custom_inventory = pd.read_sql_query(selected_stations_query, db_conn)
+
+station_inventory = station_inventory.append(custom_inventory, ignore_index=True)
+
+station_inventory = station_inventory.drop_duplicates()
+
+station_inventory['temp_name'] = station_inventory.apply(river_vs_lake_cleaner, axis=1)
+
+
+river_inventory = station_inventory[station_inventory['temp_name'].str.contains("RIVER")]
+creek_inventory = station_inventory[(station_inventory['temp_name'].str.contains("CREEK"))]
+lake_inventory = station_inventory[station_inventory['temp_name'].str.contains("LAKE")]
+
+station_inventory = station_inventory.drop(['temp_name'], axis=1)\
+                                     .sort_values(['STATION_NAME'], ascending=[True])\
+                                     .reset_index(drop=True)
 
 river_inventory.to_csv("./index_data/filtered_river_inventory.csv")
 creek_inventory.to_csv("./index_data/filtered_creek_inventory.csv")
