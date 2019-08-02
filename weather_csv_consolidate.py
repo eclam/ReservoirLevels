@@ -129,21 +129,49 @@ def prep_monthly_data(weather_list): #NOT DONE
                                           "Total Rain (mm)", "Total Snow (cm)", 
                                           "Total Precip (mm)", "Snow Grnd Last Day (cm)")
         
-        filtered_monthly = filtered_monthly.toPandas()
-
+        filtered_monthly = filtered_monthly.toPandas().reset_index(drop=True)
+                                           
         # Parse missing dates 
         # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
+
+        filtered_monthly['Date/Time'] = pd.to_datetime(filtered_monthly['Date/Time'],format="%Y-%m",errors='coerce')
+        filtered_monthly = filtered_monthly[pd.notnull(filtered_monthly['Date/Time'])] # Had a bad 'Date/Time' value 
+        
         filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])
         idx = pd.date_range(filtered_monthly['Date/Time'].iloc[0],filtered_monthly['Date/Time'].iloc[-1])
-        idx = idx.to_period('M').drop_duplicates()
+        
         filtered_monthly = filtered_monthly.set_index("Date/Time")
         filtered_monthly.index = pd.DatetimeIndex(filtered_monthly.index)
-        filtered_monthly = filtered_monthly.reindex(idx)
-        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])
+        filtered_monthly = filtered_monthly.reindex(idx)        
+        
         filtered_monthly['Year'] = filtered_monthly.index.year
         filtered_monthly['Month'] = filtered_monthly.index.month
+        
+        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])
         filtered_monthly = filtered_monthly.reset_index(drop=False)
         filtered_monthly = filtered_monthly.rename(columns={'index':"Date/Time"})
+
+        filtered_monthly['Date/Time'] = pd.to_datetime(filtered_monthly['Date/Time'],format="%Y-%m",errors='coerce')
+        filtered_monthly = filtered_monthly[pd.notnull(filtered_monthly['Date/Time'])] # Had a bad 'Date/Time' value 
+
+        filtered_monthly['Date/Time'] = filtered_monthly['Date/Time'].dt.to_period('M')
+
+        filtered_monthly = filtered_monthly.drop_duplicates(['Date/Time'])
+
+
+        # # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
+        # Fill forward a year by grouping months : e.g. 2018 January values -> 2019 January values
+        try:
+            filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])\
+                                            .groupby(['Month'], as_index=False)\
+                                            .fillna(method='ffill', limit=1)\
+                                            .reset_index(drop=True)
+
+            # Fill forward a month 
+            filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])\
+                                               .fillna(method='ffill', limit=1)
+        except:
+            pass
 
         month_avgs = filtered_monthly.groupby(["Month"],as_index=False)\
                                     ['Mean Max Temp (°C)', 'Mean Min Temp (°C)',
@@ -151,20 +179,9 @@ def prep_monthly_data(weather_list): #NOT DONE
                                     'Extr Min Temp (°C)', 'Total Rain (mm)',
                                     'Total Snow (cm)', 'Total Precip (mm)',
                                     'Snow Grnd Last Day (cm)'].mean()
-
-        # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
-        # Fill forward a year by grouping months : e.g. 2018 January values -> 2019 January values
-        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])\
-                                           .groupby(['Month'], as_index=False)\
-                                           .fillna(method='ffill', limit=1)\
-                                           .reset_index(drop=True)
-
-        # Fill forward a month 
-        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])\
-                                           .fillna(method='ffill', limit=1)
-
         # fill rest of the NULLs w/ avg
         filtered_monthly = filtered_monthly.apply(month_avg_filling_nulls,month_avgs=month_avgs,axis=1)
+
         filtered_monthly = filtered_monthly.set_index('Date/Time').to_csv('./data/consolidated_weather_data/{}-monthly.csv'.format(weather_list["Station ID"]))
 
 def daily_avg_filling_nulls(df, month_avgs):
@@ -200,29 +217,31 @@ def consolidate_daily_weather(weather_list):
 
     if os.path.isdir("{}/daily".format(weather_list["weather_dir"])):
         weather = spark.read.csv("{}/daily".format(weather_list["weather_dir"]), daily_weather_schema)
-        
         filtered_weather = weather.filter(weather['Date/Time'].like("%-%-%"))\
                                 .select('Date/Time','Year','Month','Day',
                                         "Max Temp (°C)", "Min Temp (°C)","Mean Temp (°C)", 
                                         "Total Rain (mm)", "Total Snow (cm)", 
                                         "Total Precip (mm)", "Snow on Grnd (cm)")
         
-        filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
+        filtered_weather = filtered_weather.toPandas().reset_index(drop=True)
                     
         try:
             filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d",errors='coerce')
             # Adapted From: https://stackoverflow.com/questions/13413590/how-to-drop-rows-of-pandas-dataframe-whose-value-in-a-certain-column-is-nan
             filtered_weather = filtered_weather[pd.notnull(filtered_weather['Date/Time'])] # Had a bad 'Date/Time' value 
-            print('{}:\n{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
+            # print('{}:\n{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
             # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
             filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
             idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
+            
             filtered_weather = filtered_weather.set_index("Date/Time")   
             filtered_weather.index = pd.DatetimeIndex(filtered_weather.index)
             filtered_weather = filtered_weather.reindex(idx)
+
             filtered_weather['Year'] = filtered_weather.index.year
             filtered_weather['Month'] = filtered_weather.index.month
             filtered_weather['Day'] = filtered_weather.index.day
+            
             filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
             filtered_weather = filtered_weather.reset_index(drop=False)
             filtered_weather = filtered_weather.rename(columns={'index':"Date/Time"})
@@ -231,14 +250,12 @@ def consolidate_daily_weather(weather_list):
         except:
             pass
         
-        
         # Cut out data where it has not arrived yet and prior to set time
         # filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'])
 
         # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
         # Take prev yrs weather and fill into null -> e.g. jan 01 2018 -> jan 01 2019
         try:
-
             filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
                                             .groupby(['Month', 'Day'], as_index=False)\
                                             .fillna(method='ffill', limit=1)\
@@ -279,7 +296,7 @@ weather_inventory["temp_name"] = weather_inventory.apply(clean_name, axis=1)
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
 
 weather_inventory = weather_inventory.sort_values(['Name'],ascending=[True])
-# weather_inventory.apply(prep_monthly_data,axis=1)
+weather_inventory.apply(prep_monthly_data,axis=1)
 weather_inventory.apply(consolidate_daily_weather,axis=1)
 
 

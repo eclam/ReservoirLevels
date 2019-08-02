@@ -41,3 +41,13 @@ Cluster Format? :
 - w/ precip and no precip
 - snow days, rain days, dry days 
 - 
+
+
+Split Months into seasonal categories -> Spring, Summer, Fall, Winter 
+    - Run KNN and K-Clustering to differentiate the months 
+    - Can run something called Density-Based Spatial Clustering -> maybe we can see global warming trends? 
+    - Agglomerative Hierarchical Clustering -> might be something we want 
+    - Parameter would be on temperature?? 
+    - need to split data into  training and non training 
+
+https://towardsdatascience.com/the-5-clustering-algorithms-data-scientists-need-to-know-a36d136ef68

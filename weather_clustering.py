@@ -3,7 +3,9 @@ import sys
 
 import numpy as np
 from sklearn.cluster import KMeans
+import seaborn
 
+seaborn.set()
 
 def cluster_day(filtered_df):
     if len(filtered_df) == 0:
