@@ -139,6 +139,7 @@ def prep_monthly_data(weather_list): #NOT DONE
         filtered_monthly = filtered_monthly.set_index("Date/Time")
         filtered_monthly.index = pd.DatetimeIndex(filtered_monthly.index)
         filtered_monthly = filtered_monthly.reindex(idx)
+        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])
         filtered_monthly['Year'] = filtered_monthly.index.year
         filtered_monthly['Month'] = filtered_monthly.index.month
         filtered_monthly = filtered_monthly.reset_index(drop=False)
@@ -208,8 +209,10 @@ def consolidate_daily_weather(weather_list):
         
         filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
                     
-        filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],dayfirst=False)
+        filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d")
+        print('{}:{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
         # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
+        filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
         idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
         filtered_weather = filtered_weather.set_index("Date/Time")   
         filtered_weather.index = pd.DatetimeIndex(filtered_weather.index)
@@ -217,8 +220,10 @@ def consolidate_daily_weather(weather_list):
         filtered_weather['Year'] = filtered_weather.index.year
         filtered_weather['Month'] = filtered_weather.index.month
         filtered_weather['Day'] = filtered_weather.index.day
+        filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
         filtered_weather = filtered_weather.reset_index(drop=False)
         filtered_weather = filtered_weather.rename(columns={'index':"Date/Time"})
+        
         
         
         # Cut out data where it has not arrived yet and prior to set time
@@ -252,16 +257,13 @@ def consolidate_daily_weather(weather_list):
 
 
 
-
-
-
 weather_fpath = "./index_data/filteredNULL_weather_inventory.csv"
 weather_inventory = pd.read_csv(weather_fpath, sep=",")
 
 weather_inventory["temp_name"] = weather_inventory.apply(clean_name, axis=1)
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
 
-weather_inventory.apply(prep_monthly_data,axis=1)
+# weather_inventory.apply(prep_monthly_data,axis=1)
 weather_inventory.apply(consolidate_daily_weather,axis=1)
 
 

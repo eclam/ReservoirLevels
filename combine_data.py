@@ -40,17 +40,13 @@ def get_combined_data(daily_data, hydro_station_id, weather_station_id):
     hdf.to_hdf('combined_data.hdf', 'hydro_{}'.format(hydro_station_id), mode='a')
 
 
-
-
-
 def get_station_data(station):
     return get_combined_data(daily_data, station['hydro_id'], station['weather_station_id'])
 
 
+station_data = pd.read_csv('./index_data/closest_weather_to_hydro_stations.csv')
 
-
-
-rename_map = {'HYDRO_ID': 'hydro_id',
+rename_map = { station_data.columns[0]: 'hydro_id',
               'Latitude (Decimal Degrees)': 'latitude',
               'Longitude (Decimal Degrees)': 'longitude',
               'Name': 'weather_name',
@@ -62,24 +58,24 @@ rename_map = {'HYDRO_ID': 'hydro_id',
               'First Year': 'weather_first_year',
               'Last Year': 'weather_last_year',
              }
-station_data = pd.read_csv('reservoir_weather_data.csv')
-station_data.rename(columns=rename_map, inplace=True)
+
+station_data = station_data.rename(columns=rename_map)
 #'HYDRO_ID' for hydro station id 'Station ID' for weather station id
 #station_data
 
-
+print(station_data)
 
 # see http://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/HYDAT_Definition_EN.pdf for HYDAT schema
 db_filename = 'Hydat.sqlite3'
 conn = sqlite3.connect(db_filename)
 
-
-
 station_filter_str = str(list(station_data['hydro_id']))[1:-1]
+
 daily_levels_query = "SELECT * FROM DLY_LEVELS WHERE STATION_NUMBER IN ({stations})".format(stations=station_filter_str)
-daily_data = pd.read_sql_query(daily_levels_query,conn)
+daily_levels_data = pd.read_sql_query(daily_levels_query,conn)
 
-
+daily_flows_query = "SELECT * FROM DLY_FLOWS WHERE STATION_NUMBER IN ({stations})".format(stations=station_filter_str)
+daily_flows_data = pd.read_sql_query(daily_flows_query,conn)
 
 station_data.apply(get_station_data, axis=1)
 
