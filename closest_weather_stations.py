@@ -60,9 +60,11 @@ weather_data['LON_RAD'] = np.radians(weather_data['Longitude (Decimal Degrees)']
 
 weather_data = weather_data[['Latitude (Decimal Degrees)', 'Longitude (Decimal Degrees)', 'LAT_RAD',
                              'LON_RAD', 'Name', 'Station ID', 'First Year', 'Last Year',
+                             "DLY First Year","DLY Last Year","MLY First Year","MLY Last Year",
                              "daily_temp_nullcount", "monthly_temp_nullcount",
                              "daily_precipiation_nullcount","monthly_precipiation_nullcount",
                              "daily_snow_nullcount","monthly_snow_nullcount"]]
+
 
 # link up the best (closest station w/data) weather to hydro station
 best_weather_stations = hydro_data.apply(closest_station, axis=1, weather_stations=weather_data)\
