@@ -272,6 +272,12 @@ def consolidate_daily_weather(weather_list):
 weather_fpath = "./index_data/closest_weather_to_hydro_stations.csv"
 weather_inventory = pd.read_csv(weather_fpath, sep=",")
 
+weather_inventory = weather_inventory[['Name', 'Station ID', 'First Year', 'Last Year',
+                                        "DLY First Year","DLY Last Year","MLY First Year","MLY Last Year"]].drop_duplicates()
+
+
+
+
 weather_inventory["temp_name"] = weather_inventory.apply(clean_name, axis=1)
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
 
