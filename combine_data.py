@@ -40,14 +40,14 @@ def get_combined_data(daily_data, hydro_station_id, weather_station_id):
     hdf.to_hdf('combined_data.hdf', 'hydro_{}'.format(hydro_station_id), mode='a')
 
 
-# In[16]:
+
 
 
 def get_station_data(station):
     return get_combined_data(daily_data, station['hydro_id'], station['weather_station_id'])
 
 
-# In[17]:
+
 
 
 rename_map = {'HYDRO_ID': 'hydro_id',
