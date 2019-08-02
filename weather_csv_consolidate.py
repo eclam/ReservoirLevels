@@ -210,7 +210,9 @@ def consolidate_daily_weather(weather_list):
         filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
                     
         try:
-            filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d",errors='ignore')
+            filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d",errors='coerce')
+            # Adapted From: https://stackoverflow.com/questions/13413590/how-to-drop-rows-of-pandas-dataframe-whose-value-in-a-certain-column-is-nan
+            filtered_weather = filtered_weather[pd.notnull(filtered_weather['Date/Time'])] # Had a bad 'Date/Time' value 
             print('{}:\n{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
             # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
             filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
@@ -224,17 +226,14 @@ def consolidate_daily_weather(weather_list):
             filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
             filtered_weather = filtered_weather.reset_index(drop=False)
             filtered_weather = filtered_weather.rename(columns={'index':"Date/Time"})
+
+            filtered_weather = filtered_weather[(filtered_weather['Date/Time'] < '2019-07-16')]
         except:
             pass
         
         
         # Cut out data where it has not arrived yet and prior to set time
         # filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'])
-        try:
-            filtered_weather = filtered_weather[(filtered_weather['Date/Time'] < '2019-07-16')]
-        except:
-            pass
-        
 
         # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
         # Take prev yrs weather and fill into null -> e.g. jan 01 2018 -> jan 01 2019
@@ -244,16 +243,14 @@ def consolidate_daily_weather(weather_list):
                                             .groupby(['Month', 'Day'], as_index=False)\
                                             .fillna(method='ffill', limit=1)\
                                             .reset_index(drop=True)
-        except:
-            pass    
-        
-        try:
             # Fill data from previous days data
             filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
                                             .fillna(method='ffill',limit=1)
-
         except:
-            pass
+            pass    
+        
+
+
 
         month_avgs = filtered_weather.groupby(["Month", "Day"],as_index=False)\
                                             ['Max Temp (°C)', 'Min Temp (°C)',
@@ -282,7 +279,7 @@ weather_inventory["temp_name"] = weather_inventory.apply(clean_name, axis=1)
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
 
 weather_inventory = weather_inventory.sort_values(['Name'],ascending=[True])
-weather_inventory.apply(prep_monthly_data,axis=1)
+# weather_inventory.apply(prep_monthly_data,axis=1)
 weather_inventory.apply(consolidate_daily_weather,axis=1)
 
 
