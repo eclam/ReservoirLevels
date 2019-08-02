@@ -40,3 +40,10 @@ counts
 	monthly temp: 23
 	monthly precipiation: 23
 	monthly snow: 23
+counts
+	for daily temp: 36
+	for daily precipitation: 35
+	for daily snow: 102
+	monthly temp: 23
+	monthly precipiation: 23
+	monthly snow: 23

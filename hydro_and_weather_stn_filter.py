@@ -67,7 +67,8 @@ good_stations_query = """SELECT F.*
                                      FROM STN_DATA_RANGE 
                                      WHERE YEAR_FROM <= 2010 AND 
                                      YEAR_TO == 2018 AND 
-                                     RECORD_LENGTH>=5 
+                                     RECORD_LENGTH>=5 AND
+                                     DATA_TYPE == "H"
                                     ) D
                                     ON S.STATION_NUMBER = D.STATION_NUMBER) F
                         ORDER BY F.STATION_NAME ASC;"""

@@ -78,6 +78,6 @@ weather_data = pd.merge(best_weather_stations, hydro_data.set_index('STATION_NUM
 weather_data = weather_data.drop_duplicates().drop(['Unnamed: 0'],axis=1)
 
 # Dropping stations that are WAY too far away to even have an accurate reading 
-# weather_data = weather_data[weather_data['DISTANCE']<50]
+weather_data = weather_data[weather_data['DISTANCE']<50]
 
 weather_data.to_csv('./index_data/closest_weather_to_hydro_stations.csv')

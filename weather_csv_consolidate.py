@@ -210,7 +210,7 @@ def consolidate_daily_weather(weather_list):
         filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
                     
         filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d")
-        print('{}:{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
+        # print('{}:{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
         # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
         filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
         idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
