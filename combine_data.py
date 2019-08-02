@@ -63,7 +63,7 @@ def get_combined_data(hydro_station_id, weather_station_id):
     melted_day_data['date'] = pd.to_datetime(melted_day_data['YEAR'].map(str) + '-' + melted_day_data['MONTH'].map(str)+ '-' + melted_day_data['variable'].str[5:])
     melted_day_data.set_index('date', inplace=True)
 
-    weather_data = get_weather_data(weather_station_id)
+    weather_data = get_daily_weather_data(weather_station_id)
 
     merged_data = pd.merge(melted_day_data, weather_data, left_index=True, right_index=True)
     del merged_data['variable']

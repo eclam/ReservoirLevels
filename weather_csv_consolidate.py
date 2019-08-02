@@ -209,44 +209,57 @@ def consolidate_daily_weather(weather_list):
         
         filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
                     
-        filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d",errors='ignore')
-        print('{}:\n{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
-        # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
-        filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
-        idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
-        filtered_weather = filtered_weather.set_index("Date/Time")   
-        filtered_weather.index = pd.DatetimeIndex(filtered_weather.index)
-        filtered_weather = filtered_weather.reindex(idx)
-        filtered_weather['Year'] = filtered_weather.index.year
-        filtered_weather['Month'] = filtered_weather.index.month
-        filtered_weather['Day'] = filtered_weather.index.day
-        filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
-        filtered_weather = filtered_weather.reset_index(drop=False)
-        filtered_weather = filtered_weather.rename(columns={'index':"Date/Time"})
-        
+        try:
+            filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d",errors='ignore')
+            print('{}:\n{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
+            # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
+            filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
+            idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
+            filtered_weather = filtered_weather.set_index("Date/Time")   
+            filtered_weather.index = pd.DatetimeIndex(filtered_weather.index)
+            filtered_weather = filtered_weather.reindex(idx)
+            filtered_weather['Year'] = filtered_weather.index.year
+            filtered_weather['Month'] = filtered_weather.index.month
+            filtered_weather['Day'] = filtered_weather.index.day
+            filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
+            filtered_weather = filtered_weather.reset_index(drop=False)
+            filtered_weather = filtered_weather.rename(columns={'index':"Date/Time"})
+        except:
+            pass
         
         
         # Cut out data where it has not arrived yet and prior to set time
         # filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'])
-        filtered_weather = filtered_weather[(filtered_weather['Date/Time'] < '2019-07-16')]
+        try:
+            filtered_weather = filtered_weather[(filtered_weather['Date/Time'] < '2019-07-16')]
+        except:
+            pass
         
 
         # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
         # Take prev yrs weather and fill into null -> e.g. jan 01 2018 -> jan 01 2019
-        filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
-                                           .groupby(['Month', 'Day'], as_index=False)\
-                                           .fillna(method='ffill', limit=1)\
-                                           .reset_index(drop=True)
+        try:
+
+            filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
+                                            .groupby(['Month', 'Day'], as_index=False)\
+                                            .fillna(method='ffill', limit=1)\
+                                            .reset_index(drop=True)
+        except:
+            pass    
         
-        # Fill data from previous days data
-        filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
-                                           .fillna(method='ffill',limit=1)
+        try:
+            # Fill data from previous days data
+            filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
+                                            .fillna(method='ffill',limit=1)
+
+        except:
+            pass
 
         month_avgs = filtered_weather.groupby(["Month", "Day"],as_index=False)\
-                                    ['Max Temp (°C)', 'Min Temp (°C)',
-                                     'Mean Temp (°C)', 'Total Rain (mm)', 
-                                     'Total Precip (mm)','Total Snow (cm)', 
-                                     'Snow on Grnd (cm)'].mean()
+                                            ['Max Temp (°C)', 'Min Temp (°C)',
+                                             'Mean Temp (°C)', 'Total Rain (mm)', 
+                                             'Total Precip (mm)','Total Snow (cm)', 
+                                             'Snow on Grnd (cm)'].mean()
 
         #take avg and fill remaining nulls
         filtered_weather = filtered_weather.apply(daily_avg_filling_nulls,month_avgs=month_avgs,axis=1)
