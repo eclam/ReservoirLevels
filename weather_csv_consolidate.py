@@ -21,27 +21,27 @@ daily_weather_schema = types.StructType([
     types.StructField("Month", types.IntegerType()),
     types.StructField("Day", types.IntegerType()),
     types.StructField("Data Quality", types.StringType()),
-    types.StructField("Max Temp (°C)", types.StringType()),
+    types.StructField("Max Temp (°C)", types.FloatType()),
     types.StructField("Max Temp Flag", types.StringType()),
-    types.StructField("Min Temp (°C)", types.StringType()),
+    types.StructField("Min Temp (°C)", types.FloatType()),
     types.StructField("Min Temp Flag", types.StringType()),
-    types.StructField("Mean Temp (°C)", types.StringType()),
+    types.StructField("Mean Temp (°C)", types.FloatType()),
     types.StructField("Mean Temp Flag", types.StringType()),
-    types.StructField("Heat Deg Days (°C)", types.StringType()),
+    types.StructField("Heat Deg Days (°C)", types.FloatType()),
     types.StructField("Heat Deg Days Flag", types.StringType()),
-    types.StructField("Cool Deg Days (°C)", types.StringType()),
+    types.StructField("Cool Deg Days (°C)", types.FloatType()),
     types.StructField("Cool Deg Days Flag", types.StringType()),
-    types.StructField("Total Rain (mm)", types.StringType()),
+    types.StructField("Total Rain (mm)", types.FloatType()),
     types.StructField("Total Rain Flag", types.StringType()),
-    types.StructField("Total Snow (cm)", types.StringType()),
+    types.StructField("Total Snow (cm)", types.FloatType()),
     types.StructField("Total Snow Flag", types.StringType()),
-    types.StructField("Total Precip (mm)", types.StringType()),
+    types.StructField("Total Precip (mm)", types.FloatType()),
     types.StructField("Total Precip Flag", types.StringType()),
-    types.StructField("Snow on Grnd (cm)", types.StringType()),
+    types.StructField("Snow on Grnd (cm)", types.FloatType()),
     types.StructField("Snow on Grnd Flag", types.StringType()),
-    types.StructField("Dir of Max Gust (10s deg)", types.StringType()),
+    types.StructField("Dir of Max Gust (10s deg)", types.FloatType()),
     types.StructField("Dir of Max Gust Flag", types.StringType()),
-    types.StructField("Spd of Max Gust (km/h)", types.StringType()),
+    types.StructField("Spd of Max Gust (km/h)", types.FloatType()),
     types.StructField("Spd of Max Gust Flag", types.StringType())
 ])
 
@@ -49,27 +49,27 @@ monthly_weather_schema = types.StructType([
     types.StructField('Date/Time', types.StringType()),
     types.StructField("Year", types.IntegerType()),
     types.StructField("Month", types.IntegerType()),
-    types.StructField("Mean Max Temp (°C)", types.StringType()),
+    types.StructField("Mean Max Temp (°C)", types.FloatType()),
     types.StructField("Mean Max Temp Flag", types.StringType()),
-    types.StructField("Mean Min Temp (°C)", types.StringType()),
+    types.StructField("Mean Min Temp (°C)", types.FloatType()),
     types.StructField("Mean Min Temp Flag", types.StringType()),
-    types.StructField("Mean Temp (°C)", types.StringType()),
+    types.StructField("Mean Temp (°C)", types.FloatType()),
     types.StructField("Mean Temp Flag", types.StringType()),
-    types.StructField("Extr Max Temp (°C)", types.StringType()),
-    types.StructField("Extr Max Temp Flag", types.StringType()),
-    types.StructField("Extr Min Temp (°C)", types.StringType()),
-    types.StructField("Extr Min Temp Flag", types.StringType()),
-    types.StructField("Total Rain (mm)", types.StringType()),
+    types.StructField("Extr Max Temp (°C)", types.FloatType()),
+    types.StructField("Extr Max Temp Flag", types.FloatType()),
+    types.StructField("Extr Min Temp (°C)", types.FloatType()),
+    types.StructField("Extr Min Temp Flag", types.FloatType()),
+    types.StructField("Total Rain (mm)", types.FloatType()),
     types.StructField("Total Rain Flag", types.StringType()),
-    types.StructField("Total Snow (cm)", types.StringType()),
+    types.StructField("Total Snow (cm)", types.FloatType()),
     types.StructField("Total Snow Flag", types.StringType()),
-    types.StructField("Total Precip (mm)", types.StringType()),
+    types.StructField("Total Precip (mm)", types.FloatType()),
     types.StructField("Total Precip Flag", types.StringType()),
-    types.StructField("Snow Grnd Last Day (cm)", types.StringType()),
+    types.StructField("Snow Grnd Last Day (cm)", types.FloatType()),
     types.StructField("Snow Grnd Last Day Flag", types.StringType()),
-    types.StructField("Dir of Max Gust (10's deg)", types.StringType()),
+    types.StructField("Dir of Max Gust (10's deg)", types.FloatType()),
     types.StructField("Dir of Max Gust Flag", types.StringType()),
-    types.StructField("Spd of Max Gust (km/h)", types.StringType()),
+    types.StructField("Spd of Max Gust (km/h)", types.FloatType()),
     types.StructField("Spd of Max Gust Flag", types.StringType()),
 ])
 
@@ -86,30 +86,118 @@ def get_date_value(weather_list):
     # Adapted From: https://stackoverflow.com/questions/5843518/remove-all-special-characters-punctuation-and-spaces-from-string
     return re.sub('[^A-Za-z0-9]+', '', weather_list["Date/Time"])
 
-def transform_monthly_into_daily_weather(weather_list): #NOT DONE
-    if weather_list["MLY First Year"] == 0 or weather_list["MLY First year"] == 0: #only need the first year
+def month_avg_filling_nulls(df, month_avgs):
+    month = month_avgs[month_avgs['Month'] == df['Month']]
+    month = month.iloc[0]
+
+    if pd.isnull(df['Mean Max Temp (°C)']):
+        df['Mean Max Temp (°C)'] = month['Mean Max Temp (°C)']
+    
+    if pd.isnull(df['Mean Min Temp (°C)']):
+        df['Mean Min Temp (°C)'] = month['Mean Min Temp (°C)']
+        
+    if pd.isnull(df["Mean Temp (°C)"]):
+        df['Mean Temp (°C)'] = month['Mean Temp (°C)']
+
+    if pd.isnull(df["Extr Max Temp (°C)"]):
+        df['Extr Max Temp (°C)'] = month['Extr Max Temp (°C)']
+
+    if pd.isnull(df["Extr Min Temp (°C)"]):
+        df['Extr Min Temp (°C)'] = month['Extr Min Temp (°C)']
+
+    if pd.isnull(df["Total Rain (mm)"]):
+        df["Total Rain (mm)"] = month['Total Rain (mm)']
+
+    if pd.isnull(df["Total Snow (cm)"]):
+        df["Total Snow (cm)"] = month['Total Snow (cm)']
+
+    if pd.isnull(df["Total Precip (mm)"]):
+        df['Total Precip (mm)'] = month['Total Precip (mm)']
+    
+    if pd.isnull(df["Snow Grnd Last Day (cm)"]):
+        df['Snow Grnd Last Day (cm)'] = month['Snow Grnd Last Day (cm)']
+    
+    return df
+
+def prep_monthly_data(weather_list): #NOT DONE
+    if weather_list["MLY First Year"] == 0 or weather_list["MLY Last Year"] == 0: #only need the first year
         return
 
     if os.path.isdir("{}/monthly".format(weather_list["weather_dir"])):
         weather = spark.read.csv("{}/monthly".format(weather_list["weather_dir"]), monthly_weather_schema)
-        filtered_monthly = weather.filter(weather['Date/Time'].like("%-%-%"))\
-                                  .filter(weather['Year'] >= 2010)\
+        filtered_monthly = weather.filter(weather['Date/Time'].like("%-%"))\
                                   .select('Date/Time','Year','Month', 
                                           "Mean Max Temp (°C)", "Mean Min Temp (°C)", "Mean Temp (°C)",
+                                          'Extr Min Temp (°C)', 'Extr Max Temp (°C)',
                                           "Total Rain (mm)", "Total Snow (cm)", 
                                           "Total Precip (mm)", "Snow Grnd Last Day (cm)")
         
         filtered_monthly = filtered_monthly.toPandas()
         filtered_monthly['date_value'] = filtered_monthly.apply(get_date_value,axis=1)
-        filtered_monthly = filtered_monthly[(filtered_monthly['date_value'].astype(int) < 201907)]
-        filtered_monthly = filtered_monthly[(filtered_monthly['date_value'].astype(int) > 199012)]
 
-        # filtered_monthly = filtered_monthly.apply(consolidate_daily_for_monthly,axis=1)
+        # Parse missing dates 
+        # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
+        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])
+        idx = pd.date_range(filtered_monthly['Date/Time'].iloc[0],filtered_monthly['Date/Time'].iloc[-1])
+        idx = idx.to_period('M')
+        filtered_monthly = filtered_monthly.set_index("Date/Time")
+        filtered_monthly.index = pd.DatetimeIndex(filtered_monthly.index)
+        filtered_monthly['Year'] = filtered_monthly.index.year
+        filtered_monthly['Month'] = filtered_monthly.index.month
+        filtered_monthly = filtered_monthly.reindex(idx,fill_value='NaN')
+
+
+        month_avgs = filtered_monthly.groupby(["Month"],as_index=False)\
+                                    ['Mean Max Temp (°C)', 'Mean Min Temp (°C)',
+                                    'Mean Temp (°C)', 'Extr Max Temp (°C)',
+                                    'Extr Min Temp (°C)', 'Total Rain (mm)',
+                                    'Total Snow (cm)', 'Total Precip (mm)',
+                                    'Snow Grnd Last Day (cm)'].mean()
+
+        # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
+        
+        # Fill forward a year by grouping months : e.g. 2018 January values -> 2019 January values
+        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])\
+                                           .groupby(['Month'], as_index=False)\
+                                           .fillna(method='ffill', limit=1)\
+                                           .reset_index(drop=True)
+
+        # Fill forward a month 
+        filtered_monthly = filtered_monthly.sort_values(['Year', 'Month'], ascending=[True, True])\
+                                           .fillna(method='ffill', limit=1)
+
+        # fill rest of the NULLs w/ avg
+        filtered_monthly = filtered_monthly.apply(month_avg_filling_nulls,month_avgs=month_avgs,axis=1)
 
         filtered_monthly = filtered_monthly.drop(['date_value'],axis=1)
-        filtered_monthly = filtered_monthly.set_index('Date/Time')\
-                                           .to_csv('./data/consolidated_weather_data/daily/{}.csv')\
-                                           .format(weather_list["Station ID"]))
+        filtered_monthly = filtered_monthly.to_csv('./data/consolidated_weather_data/monthly/{}.csv'.format(weather_list["Station ID"]))
+
+def daily_avg_filling_nulls(df, month_avgs):
+    month = month_avgs[month_avgs['Month'] == df['Month']]
+    month = month.iloc[0]
+
+    if pd.isnull(df["Max Temp (°C)"]):
+        df["Max Temp (°C)"] = month["Max Temp (°C)"]
+    
+    if pd.isnull(df['Min Temp (°C)']):
+        df['Min Temp (°C)'] = month['Min Temp (°C)']
+        
+    if pd.isnull(df["Mean Temp (°C)"]):
+        df['Mean Temp (°C)'] = month['Mean Temp (°C)']
+
+    if pd.isnull(df["Total Rain (mm)"]):
+        df["Total Rain (mm)"] = month["Total Rain (mm)"]
+
+    if pd.isnull(df["Total Snow (cm)"]):
+        df["Total Snow (cm)"] = month["Total Snow (cm)"]
+
+    if pd.isnull(df["Total Precip (mm)"]):
+        df['Total Precip (mm)'] = month['Total Precip (mm)']
+    
+    if pd.isnull(df["Snow on Grnd (cm)"]):
+        df['Snow on Grnd (cm)'] = month['Snow on Grnd (cm)']
+    
+    return df
 
 def consolidate_daily_weather(weather_list):
     if weather_list["DLY First Year"] == 0 or weather_list["DLY Last Year"] == 0:
@@ -124,36 +212,55 @@ def consolidate_daily_weather(weather_list):
                                         "Total Rain (mm)", "Total Snow (cm)", 
                                         "Total Precip (mm)", "Snow on Grnd (cm)")
         
-        filtered_weather = filtered_weather.toPandas()
+        filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
         filtered_weather['date_value'] = filtered_weather.apply(get_date_value,axis=1)
+
+                    
+        filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],dayfirst=False)
+        # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
+        idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
+        filtered_weather = filtered_weather.set_index("Date/Time")   
+        filtered_weather.index = pd.DatetimeIndex(filtered_weather.index)
+        filtered_weather['Year'] = filtered_weather.index.year
+        filtered_weather['Month'] = filtered_weather.index.month
+        filtered_weather['Day'] = filtered_weather.index.day
+        filtered_weather = filtered_weather.reindex(idx, fill_value='NaN')
+
+        
 
         # Cut out data where it has not arrived yet and prior to set time
         filtered_weather = filtered_weather[(filtered_weather['date_value'].astype(int) < 20190716)]
         filtered_weather = filtered_weather[(filtered_weather['date_value'].astype(int) > 19901231)]
 
+        # If daily does exist and has gaps, fill it w/ monthly values 
+        if os.path.isdir('./data/consolidated_weather_data/monthly/{}.csv'.format(weather_list["Station ID"])):
+            
+
         # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe
+        # Take prev yrs weather and fill into null -> e.g. jan 01 2018 -> jan 01 2019
         filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
-                                           .fillna(method='ffill')
+                                           .groupby(['Month', 'Day'], as_index=False)\
+                                           .fillna(method='ffill', limit=1)\
+                                           .reset_index(drop=True)
+        
+        # Fill data from previous days data
         filtered_weather = filtered_weather.sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
-                                           .groupby(['Month'], as_index=False)\
-                                           .fillna(method='ffill')\
-                                           .reset_index()
+                                           .fillna(method='ffill',limit=1)
+
+        month_avgs = filtered_weather.groupby(["Month", "Day"],as_index=False)\
+                                    ['Max Temp (°C)', 'Min Temp (°C)',
+                                     'Mean Temp (°C)', 'Total Rain (mm)', 
+                                     'Total Precip (mm)','Total Snow (cm)', 
+                                     'Snow on Grnd (cm)'].mean()
+
+        #take avg and fill remaining nulls
+        filtered_weather = filtered_weather.apply(daily_avg_filling_nulls,month_avgs=month_avgs,axis=1)
 
         filtered_weather = filtered_weather.drop(['date_value'],axis=1)
-        filtered_weather = filtered_weather.set_index('Date/Time')\
-                        .to_csv('./data/consolidated_weather_data/daily/{}.csv'.format( weather_list["Station ID"] ))
+        filtered_weather = filtered_weather.to_csv('./data/consolidated_weather_data/daily/{}.csv'.format( weather_list["Station ID"] ))
         # .sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])\
 
-# def consolidate_daily_for_monthly(df):
-    # if df['Mean Max Temp (°C)'].isnull():
-    # if df['Mean Min Temp (°C)'].isnull():
-    # if df["Mean Temp (°C)"].isnull():
-    # if df["Extr Max Temp (°C)"].isnull():
-    # if df["Extr Min Temp (°C)"].isnull():
-    # if df["Total Rain (mm)"].isnull():
-    # if df["Total Snow (cm)"].isnull():
-    # if df["Total Precip (mm)"].isnull():
-    # if df["Snow Grnd Last Day (cm)"].isnull():
+
 
 
 
@@ -165,5 +272,7 @@ weather_inventory = pd.read_csv(weather_fpath, sep=",")
 weather_inventory["temp_name"] = weather_inventory.apply(clean_name, axis=1)
 weather_inventory["weather_dir"] = weather_inventory.apply(get_dir, axis=1)
 
-weather_inventory.apply(transform_monthly_into_daily_weather,axis=1)
-# weather_inventory.apply(consolidate_daily_weather,axis=1)
+# weather_inventory.apply(prep_monthly_data,axis=1)
+weather_inventory.apply(consolidate_daily_weather,axis=1)
+
+

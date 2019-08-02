@@ -11,33 +11,6 @@ spark.sparkContext.setLogLevel('WARN')
 assert sys.version_info >= (3, 5)  # make sure we have Python 3.5+
 assert spark.version >= '2.3'  # make sure we have Spark 2.3+
 
-hourly_weather_schema = types.StructType([
-    types.StructField("Date/Time", types.StringType()),
-    types.StructField("Year", types.IntegerType()),
-    types.StructField("Month", types.IntegerType()),
-    types.StructField("Day", types.IntegerType()),
-    types.StructField("Time", types.StringType()),
-    types.StructField("Temp (°C)", types.StringType()),
-    types.StructField("Temp Flag", types.StringType()),
-    types.StructField("Dew Point Temp (°C)", types.StringType()),
-    types.StructField("Dew Point Temp Flag", types.StringType()),
-    types.StructField("Rel Hum (%)", types.StringType()),
-    types.StructField("Rel Hum Flag", types.StringType()),
-    types.StructField("Wind Dir (10s deg)", types.StringType()),
-    types.StructField("Wind Dir Flag", types.StringType()),
-    types.StructField("Wind Spd (km/h)", types.StringType()),
-    types.StructField("Wind Spd Flag", types.StringType()),
-    types.StructField("Visibility (km)", types.StringType()),
-    types.StructField("Visibility Flag", types.StringType()),
-    types.StructField("Stn Press (kPa)", types.StringType()),
-    types.StructField("Stn Press Flag", types.StringType()),
-    types.StructField("Hmdx", types.StringType()),
-    types.StructField("Hmdx Flag", types.StringType()),
-    types.StructField("Wind Chill", types.StringType()),
-    types.StructField("Wind Chill Flag", types.StringType()),
-    types.StructField("Weather", types.StringType())
-])
-
 daily_weather_schema = types.StructType([
     types.StructField('Date/Time', types.StringType()),
     types.StructField("Year", types.IntegerType()),
@@ -146,7 +119,7 @@ def filter_temp_daily(weather_list):
 def filter_temp_monthly(weather_list):
     if os.path.isdir("{}/monthly".format(weather_list["weather_dir"])):
         weather = spark.read.csv("{}/monthly".format(weather_list["weather_dir"]), monthly_weather_schema)
-        filtered_weather = weather.filter(weather['Date/Time'].like("%-%-%"))\
+        filtered_weather = weather.filter(weather['Date/Time'].like("%-%"))\
                 .filter(weather['Year'] >= 2010)\
                 .select('Date/Time','Year','Month', 
                         "Mean Max Temp (°C)", "Mean Min Temp (°C)", "Mean Temp (°C)",
@@ -208,7 +181,7 @@ def filter_rain_daily(weather_list):
 def filter_rain_monthly(weather_list):
     if os.path.isdir("{}/monthly".format(weather_list["weather_dir"])):
         weather = spark.read.csv("{}/monthly".format(weather_list["weather_dir"]), monthly_weather_schema)
-        filtered_weather = weather.filter(weather['Date/Time'].like("%-%-%"))\
+        filtered_weather = weather.filter(weather['Date/Time'].like("%-%"))\
             .filter(weather['Year'] >= 2010)\
             .select('Date/Time','Year','Month', "Total Rain (mm)", "Total Precip (mm)")
         
@@ -264,7 +237,7 @@ def filter_snow_daily(weather_list):
 def filter_snow_monthly(weather_list):
     if os.path.isdir("{}/monthly".format(weather_list["weather_dir"])):
         weather = spark.read.csv("{}/monthly".format(weather_list["weather_dir"]), monthly_weather_schema)
-        filtered_weather = weather.filter(weather['Date/Time'].like("%-%-%"))\
+        filtered_weather = weather.filter(weather['Date/Time'].like("%-%"))\
             .filter(weather['Year'] >= 2010)\
             .select('Date/Time','Year','Month', "Total Snow (cm)", "Snow Grnd Last Day (cm)")
         

@@ -36,6 +36,11 @@ steps to run:
     - <IMPORTANT NOTE>: this COULD does filter whether distances <50 km 
 - run `spark-submit --master=local[2] weather_csv_consolidate.py` 
     - parse all the files together properly (needs to be edited and adjust properly)
+    - (for monthly): sorts df, group by month then previous year will fill the next line. We take avg value of that given month and fill the rest
+    - (for daily): if monthly data exists, take the values and extrapolate the values to fill in gaps 
+        - if there are still gaps, forward fill by grouping by month then fill in by previous year 
+
+    - fills in missing dates 
 - run `combine_data.py` into workable file format for our models (need to be eventually done)
 
 
