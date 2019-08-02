@@ -31,4 +31,13 @@ Things to do :
         clusters of years of those months 
     - stdev 
     (looking for a base where we can build data off of -> get stdev )
-(look into other forms of clustering)
+    (look into other forms of clustering)
+    - FIGURE OUT WHAT WE NEED TO CLUSTER
+
+Cluster Format? :
+- Rain + Precipitation + Snow vs Levels
+- Temperature vs Levels 
+- LOOK BY DAILY (JUNE JULY AUG SEPT) -> examine features of summer months -> see levels of water
+- w/ precip and no precip
+- snow days, rain days, dry days 
+- 

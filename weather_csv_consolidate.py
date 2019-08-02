@@ -209,8 +209,8 @@ def consolidate_daily_weather(weather_list):
         
         filtered_weather = filtered_weather.toPandas().reset_index(drop=True).sort_values(['Year', 'Month', 'Day'], ascending=[True, True, True])
                     
-        filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d")
-        # print('{}:{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
+        filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'],format="%Y-%m-%d",errors='ignore')
+        print('{}:\n{}'.format(filtered_weather['Date/Time'],weather_list['temp_name']))
         # Adapted from: https://stackoverflow.com/questions/34326546/reindex-to-add-missing-dates-to-pandas-dataframe
         filtered_weather = filtered_weather.sort_values(['Date/Time','Year', 'Month', 'Day'], ascending=[True,True, True, True])
         idx = pd.date_range(filtered_weather['Date/Time'].iloc[0],filtered_weather['Date/Time'].iloc[-1])
@@ -228,8 +228,7 @@ def consolidate_daily_weather(weather_list):
         
         # Cut out data where it has not arrived yet and prior to set time
         # filtered_weather['Date/Time'] = pd.to_datetime(filtered_weather['Date/Time'])
-        filtered_weather = filtered_weather[(filtered_weather['Date/Time'] < '2019-07-16') &
-                                            (filtered_weather['Date/Time'] > '1990-12-31')]
+        filtered_weather = filtered_weather[(filtered_weather['Date/Time'] < '2019-07-16')]
         
 
         # Adapted From: https://stackoverflow.com/questions/27905295/how-to-replace-nans-by-preceding-values-in-pandas-dataframe

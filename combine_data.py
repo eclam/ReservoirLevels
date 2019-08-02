@@ -19,22 +19,42 @@ daily_data = pd.read_sql_query(daily_levels_query,conn)
 
 
 
-def get_weather_data(weather_station_id):
-    weather_data = pd.read_csv('weather_data_test/{weather_id}.csv'.format(weather_id=weather_station_id)).set_index('Date/Time')
+def get_daily_weather_data(weather_station_id):
+    weather_data = pd.read_csv('./data/consolidated_weather_data/{weather_id}-daily.csv'.format(weather_id=weather_station_id)).set_index('Date/Time')
     rename_map = {'Total Rain (mm)': 'rain', # in mm
                   'Total Precip (mm)': 'precip', # in mm
                   'Max Temp (°C)': 'max_temp', # in C,
                   'Min Temp (°C)': 'min_temp', # in C,
                   'Mean Temp (°C)': 'mean_temp', # in C,
+                  'Snow on Grnd (cm)': 'snow_on_grnd',
+                  'snow_precip': 'Total Snow (cm)',
                  }
-    weather_data.rename(columns=rename_map, inplace=True)
-    weather_data['snow_on_grnd'] = weather_data['Snow on Grnd (cm)'] * 10 # convert to mm
-    weather_data['snow_precip'] = weather_data['Total Snow (cm)'] * 10 # convert to mm
+    weather_data = weather_data.rename(columns=rename_map, inplace=True)
+    weather_data['snow_on_grnd'] = weather_data['snow_on_grnd'] * 10 # convert to mm
+    weather_data['snow_precip'] = weather_data['snow_precip'] * 10 # convert to mm
 
-    del weather_data['Snow on Grnd (cm)']
-    del weather_data['Total Snow (cm)']
-    # get rid of weather data values w/o precip data?
     return weather_data#.dropna(subset=['precip'])
+
+def get_monthly_weather_data(weather_station_id):
+    weather_data = pd.read_csv('./data/consolidated_weather_data/{weather_id}-monthly.csv'.format(weather_id=weather_station_id)).set_index('Date/Time')
+    rename_map = {'Mean Max Temp (°C)':'mean_max_temp', # in C
+                'Mean Min Temp (°C)':'mean_min_temp', # in C
+                'Mean Temp (°C)':'mean_temp',         # in C
+                'Extr Max Temp (°C)':'month_max_temp',# in C
+                'Extr Min Temp (°C)':'month_min_temp',# in C
+                'Total Rain (mm)':'rain',             # in mm
+                'Total Precip (mm)':'precip',
+                'Total Snow (cm)':'total_snow', 
+                'Snow Grnd Last Day (cm)':'remaining_snow',
+                }
+    weather_data.rename(columns=rename_map, inplace=True)
+    weather_data['total_snow'] = weather_data['total_snow']*10
+    weather_data['remaining_snow'] = weather_data['remaining_snow']*10
+
+    return weather_data#.dropna(subset=['precip'])
+
+
+
 
 def get_combined_data(hydro_station_id, weather_station_id):
     LEVELS = ['LEVEL{}'.format(dayno) for dayno in range(1,32)]
