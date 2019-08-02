@@ -6,7 +6,7 @@ import sqlite3
 
 DAILY_WEATHER_DIR = './data/consolidated_weather_data/{weather_id}-daily.csv'
 MONTHLY_WEATHER_DIR = './data/consolidated_weather_data/{weather_id}-monthly.csv'
-HYDAT_DB = 'Hydat.sqlite3'
+HYDAT_DB = './data/Hydat.sqlite3'
 MONTHLY_HDF_OUTPUT = 'monthly_combined_data.hdf'
 DAILY_HDF_OUTPUT = 'daily_combined_data.hdf'
 
