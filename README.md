@@ -14,7 +14,7 @@
         - https://drive.google.com/drive/folders/1WJCDEU34c60IfOnG4rv5EPZ4IhhW9vZH
 
 4. make sure to have these python libraries installed before proceeding: 
-    - h5py, tables, seaborn, pandas, numpy, scikitlearn, etc... 
+    - h5py, tables, joblib, seaborn, pandas, numpy, sklearn, scikitlearn, etc... 
         - i.e. `pip3 install --user h5py tables seaborn`
 5. You need python3, jupyter-notebook and pyspark installed in order to run our code. So, install those. 
 ==================================================================
@@ -43,5 +43,17 @@
 
 5.  run `combine_data.py` into a combined file format for our models 
 
-6. Our jupyter-notebooks has our data science analysis stuff 
+#Analysis stuff: 
+**WARNING**: DO NOT RUN ALL ON NOTEBOOKS! We have some cells for testing but intended to be ran for experimental / model optimization purposes.  
+Our jupyter-notebooks has our data science analysis stuff. 
+3 Different notebooks: 
+- `monthly_models.ipynb` -> Contains rudimentary models 
+- `daily_models.ipynb` -> contains models to generate regressor models for individual hydro stations 
+    - Run all the cells up to the one that general the models and nothing else. 
+    - 30 different hydro stations -> only made to run the first five 
+    - if you want the other models, run the function `create_models(key) ` to generate that model 
+    - if you want to see all keys, the daily keys variable will contain that 
+-  `generate_regressor_input` -> allows us to use the regressors by only providing a date range 
+
+
 

@@ -266,9 +266,6 @@ def consolidate_daily_weather(weather_list):
         except:
             pass    
         
-
-
-
         month_avgs = filtered_weather.groupby(["Month", "Day"],as_index=False)\
                                             ['Max Temp (°C)', 'Min Temp (°C)',
                                              'Mean Temp (°C)', 'Total Rain (mm)', 
