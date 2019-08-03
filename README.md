@@ -6,10 +6,11 @@
     - Hydat.sqlite3: https://www.canada.ca/en/environment-climate-change/services/water-overview/quantity/monitoring/survey/data-products-services/national-archive-hydat.html
 
 3. Run this script to download weather_data:
-   a.)  run `grab_weather_data.py` if you want the COMPLETE 4gb+ data set. (Note: This is not optimized and will take 5 hours +)
-    b.) run `dl_filtered_weather_data.py` for PARTIALLY FILTERED weather data. (RECOMMENDED)
+    - a.)  run `grab_weather_data.py` if you want the COMPLETE 4gb+ data set. 
+            - (Note: This is not optimized and will take 5 hours +)
+    - b.) run `dl_filtered_weather_data.py` for PARTIALLY FILTERED weather data. (**RECOMMENDED**)
         - (Note: Does take a bit of time to download...)
-    Source: (We are not joking. They left instructions in a Google Drive...)
+    - Source: (We are not joking. They left instructions in a Google Drive...)
         - https://drive.google.com/drive/folders/1WJCDEU34c60IfOnG4rv5EPZ4IhhW9vZH
 
 4. make sure to have these python libraries installed before proceeding: 
