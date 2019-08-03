@@ -1,49 +1,46 @@
-# Reservoir Levels
+# PROJECT GUIDE ON HOW TO RUN OUR CODE: 
+**WARNING**: YOU MUST DO THE FOLLOWING BEFORE PROCEEDING :
+1. make a folder called data within the same folder as the scripts -> run this command in linux bash : `mkdir data`
 
-reservoir\_list.csv - manually generated list of reservoirs and hydro stations
+2. Files to download: 
+    - Hydat.sqlite3: https://www.canada.ca/en/environment-climate-change/services/water-overview/quantity/monitoring/survey/data-products-services/national-archive-hydat.html
 
-reservoir\_weather\_data.csv - list of hydro station weather station pairings, including some metadata
+3. Run this script to download weather_data:
+   a.)  run `grab_weather_data.py` if you want the COMPLETE 4gb+ data set. (Note: This is not optimized and will take 5 hours +)
+    b.) run `dl_filtered_weather_data.py` for PARTIALLY FILTERED weather data. (RECOMMENDED)
+        - (Note: Does take a bit of time to download...)
+    Source: (We are not joking. They left instructions in a Google Drive...)
+        - https://drive.google.com/drive/folders/1WJCDEU34c60IfOnG4rv5EPZ4IhhW9vZH
 
-weather\_data\_test/\*.csv - by station\_id, daily weather data in a single file
+4. make sure to have these python libraries installed before proceeding: 
+    - h5py, tables, seaborn, pandas, numpy, scikitlearn, etc... 
+        - i.e. `pip3 install --user h5py tables seaborn`
+5. You need python3, jupyter-notebook and pyspark installed in order to run our code. So, install those. 
+==================================================================
 
-`combined_data.hdf` - dataframe of combined level + weather data. Each dataframe stored under key `hydro_<hydro_station_id>`
-
-
-steps to run:
-- run the get-weather-data script
-- run `closest_weather_stations.py` to get the best weather station for each hydro station
-- run `weather_csv_consolidate.py` to collect all the daily data for each weather station and combine it into one file (spark)
-- run `combine_data.py` to consolidate the level and weather data (TODO: better name)
-
-
-
-
-(eric) steps to run IN FOLLOWING ORDER to filter and combine data: 
-- run `python3 hydro_and_weather_stn_filter.py` to filter out weather_station and hydro_station data 
+# Steps to filter data : 
+1. run `python3 hydro_and_weather_stn_filter.py` to filter out weather_station and hydro_station data 
     - hydro_station data is broken up to River, Creek, Lake -> produces these files: 
         - `filtered_creek_inventory.csv`    
         - `filtered_lake_inventory.csv`
         - `filtered_river_inventory.csv`
         - `filtered_station_inventory.csv` (combination of all of these files)
 
-- run `python3 cpy_move_data.py` (NOT MANDATORY -> for Eric's use)
-- run `python3 dl_filtered_weather_data.py` to move the data to a filtered folder (NOT MANDATORY -> Eric's use)
-- run `spark-submit --master=local[2] filter_bad_weather_data.py` to filter out bad weather stations 
+2. run `spark-submit filter_bad_weather_data.py` to filter out bad weather stations 
     - gives you a number of bad weather stations based on the data column bundle 
         - i.e. Rain, Snow, Temperature
     - produces this file:  `filteredNULL_weather_inventory.csv`
-- run `python3 closest_weather_stations.py` 
-    - <IMPORTANT NOTE>: this COULD does filter whether distances <50 km 
-- run `spark-submit --master=local[2] weather_csv_consolidate.py` 
+    - Some stations specialize in certain metric recording. 
+        -i.e. Kelp Reefs is strictly a wind station and is terrible for our purposes
+
+3. run `python3 closest_weather_stations.py` 
+    - matches closes weather stations to the closest bodies of water 
+
+ 4. run `spark-submit weather_csv_consolidate.py` 
     - parse all the files together properly (needs to be edited and adjust properly)
-    - (for monthly): sorts df, group by month then previous year will fill the next line. We take avg value of that given month and fill the rest
-    - (for daily): if monthly data exists, take the values and extrapolate the values to fill in gaps 
-        - if there are still gaps, forward fill by grouping by month then fill in by previous year 
-
     - fills in missing dates 
-- run `combine_data.py` into workable file format for our models (need to be eventually done)
 
+5.  run `combine_data.py` into a combined file format for our models 
 
-NOTE: 
-- Some stations specialize in certain metric recording. 
-    -I.E. Kelp Reefs is a wind station and is terrible for our purposes
+6. Our jupyter-notebooks has our data science analysis stuff 
+
