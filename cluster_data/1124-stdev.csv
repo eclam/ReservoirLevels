@@ -1,4 +1,4 @@
-day,month,year,max_temp,min_temp,mean_temp,rain,snow_precip,precip,snow_on_ground
+day,month,year,max_temp,min_temp,mean_temp,rain,snow_precip,precip,snow_on_grnd
 1894,1,9.092121131323903,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 1894,2,8.225975119502044,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 1894,3,9.092121131323903,0.0,0.0,0.0,0.0,0.0,0.0,0.0
