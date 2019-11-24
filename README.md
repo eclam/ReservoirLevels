@@ -3,7 +3,7 @@
 1. make a folder called data within the same folder as the scripts -> run this command in linux bash : `mkdir data`
 
 2. Files to download: 
-    - Hydat.sqlite3: https://www.canada.ca/en/environment-climate-change/services/water-overview/quantity/monitoring/survey/data-products-services/national-archive-hydat.html
+    - [Hydat.sqlite3](https://www.canada.ca/en/environment-climate-change/services/water-overview/quantity/monitoring/survey/data-products-services/national-archive-hydat.html)
 
 3. Run this script to download weather_data:
     - a.)  run `grab_weather_data.py` if you want the COMPLETE 4gb+ data set. 
