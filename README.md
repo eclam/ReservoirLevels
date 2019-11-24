@@ -44,15 +44,14 @@
 
 #Analysis stuff: 
 **WARNING**: DO NOT RUN ALL ON NOTEBOOKS! We have some cells for testing but intended to be ran for experimental / model optimization purposes.  
-Our jupyter-notebooks has our data science analysis stuff. 
-3 Different notebooks: 
+The following jupyter-notebook scripts contains our data science analysis models/model generators. 
 - `monthly_models.ipynb` -> Contains rudimentary models 
 - `daily_models.ipynb` -> contains models to generate regressor models for individual hydro stations 
-    - Run all the cells up to the one that general the models and nothing else. 
+    - Run all the cells up to the one that generates the models. 
     - 30 different hydro stations -> only made to run the first five 
-    - if you want the other models, run the function `create_models(key) ` to generate that model 
-    - if you want to see all keys, the daily keys variable will contain that 
--  `generate_regressor_input` -> allows us to use the regressors by only providing a date range 
+    - If other models are required, run the function `create_models(key) ` to generate the model 
+    - The daily keys variable contains all the keys 
+-  `generate_regressor_input` -> allows the user to use the regressors by only providing a date range 
 
 
 
